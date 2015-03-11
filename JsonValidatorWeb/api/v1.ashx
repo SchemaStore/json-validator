@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using JSONWebValidator.Models;
 using Microsoft.JSON.Core.Schema;
+using Microsoft.JSON.Core.Schema.Validation.Format;
 using Newtonsoft.Json;
 using StandaloneJsonValidator;
 
@@ -19,7 +20,7 @@ public class v1 : IHttpHandler
     public void ProcessRequest(HttpContext context)
     {
         if (!string.Equals(context.Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
-         {
+        {
             context.WriteResponse(new ApiError { Message = "Requests to this API must be POSTs" }, HttpStatusCode.MethodNotAllowed);
             return;
         }
@@ -121,7 +122,7 @@ public class v1 : IHttpHandler
         context.WriteResponse(results, HttpStatusCode.OK);
     }
 
-    private static readonly IEnumerable<IJSONSchemaFormatHandler> FormatHandlers = new IJSONSchemaFormatHandler[0];
+    private static readonly IEnumerable<IJSONSchemaFormatHandler> FormatHandlers = new IJSONSchemaFormatHandler[] { new DateTimeValidator(), new EmailValidator(), new HostNameValidator(), new InternetProtocolAddressV4Validator(), new InternetProtocolAddressV6Validator(), new RegexValidator(), new UriValidator(), new UrlValidator() };
 
     public bool IsReusable
     {
