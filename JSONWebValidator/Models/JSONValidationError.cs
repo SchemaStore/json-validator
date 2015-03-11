@@ -1,4 +1,6 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using StandaloneJsonValidator;
 
 namespace JSONWebValidator.Models
 {
@@ -12,5 +14,11 @@ namespace JSONWebValidator.Models
 
         [JsonProperty]
         public int Start { get; set; }
+
+        [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
+        public JSONErrorKind Kind { get; set; }
+
+        [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
+        public JSONErrorLocation Location { get; set; }
     }
 }

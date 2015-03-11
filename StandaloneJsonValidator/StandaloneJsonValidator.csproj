@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JSONError.cs" />
     <Compile Include="JSONParserHack.cs" />
     <Compile Include="JsonValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

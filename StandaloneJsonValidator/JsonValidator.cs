@@ -18,21 +18,75 @@ namespace StandaloneJsonValidator
             return !Validate(instanceTextProvider, schemaTextProvider, Enumerable.Empty<IJSONSchemaFormatHandler>()).Any();
         }
 
-        public static IEnumerable<JSONSchemaValidationIssue> Validate(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static IEnumerable<JSONError> Validate(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             JSONDocumentLoader loader = new JSONDocumentLoader();
             JSONParser parser = JSONParserHack.Create();
             JSONDocument schemaDoc = parser.Parse(schemaTextProvider);
             JSONDocument instanceDoc = parser.Parse(instanceTextProvider);
+            List<JSONError> allErrors = new List<JSONError>();
+
+            {
+                foreach (Tuple<JSONParseItem, JSONParseError> error in instanceDoc.GetContainedParseErrors())
+                {
+                    allErrors.Add(new JSONError
+                    {
+                        Kind = JSONErrorKind.Syntax,
+                        Length = error.Item1.Length,
+                        Start = error.Item1.Start,
+                        Location = JSONErrorLocation.InstanceDocument,
+                        Message = error.Item2.Text ?? error.Item2.ErrorType.ToString()
+                    });
+                }
+            }
+
+            {
+                foreach (Tuple<JSONParseItem, JSONParseError> error in schemaDoc.GetContainedParseErrors())
+                {
+                    allErrors.Add(new JSONError
+                    {
+                        Kind = JSONErrorKind.Syntax,
+                        Length = error.Item1.Length,
+                        Start = error.Item1.Start,
+                        Location = JSONErrorLocation.Schema,
+                        Message = error.Item2.Text ?? error.Item2.ErrorType.ToString()
+                    });
+                }
+            }
 
             loader.SetCacheItem(new JSONDocumentLoadResult(schemaDoc));
             loader.SetCacheItem(new JSONDocumentLoadResult(instanceDoc));
 
             JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc.TopLevelValue, (JSONObject)schemaDoc.TopLevelValue, loader, formatHandlers).Result;
-            return tree.ValidationIssues;
+
+            foreach (JSONSchemaValidationIssue issue in tree.ValidationIssues)
+            {
+                allErrors.Add(new JSONError
+                {
+                    Kind = JSONErrorKind.Validation,
+                    Start = issue.TargetItem.Start,
+                    Length = issue.TargetItem.Length,
+                    Location = JSONErrorLocation.InstanceDocument,
+                    Message = issue.Message
+                });
+            }
+
+            foreach (JSONSchemaSanityIssue issue in tree.SanityIssues)
+            {
+                allErrors.Add(new JSONError
+                {
+                    Kind = JSONErrorKind.Validation,
+                    Start = issue.ParseItem.Start,
+                    Length = issue.ParseItem.Length,
+                    Location = JSONErrorLocation.Schema,
+                    Message = issue.Message
+                });
+            }
+
+            return allErrors;
         }
 
-        public static IEnumerable<JSONSchemaValidationIssue> Validate(string instanceText, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static IEnumerable<JSONError> Validate(string instanceText, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(@"c:\temp\instance.json", instanceText);
             StringWithFileNameTextProvider schemaProvider = new StringWithFileNameTextProvider(@"c:\temp\schema.json", schemaText);
@@ -50,7 +104,7 @@ namespace StandaloneJsonValidator
             }
         }
 
-        public static IEnumerable<JSONSchemaValidationIssue> Validate(string instanceText, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static IEnumerable<JSONError> Validate(string instanceText, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(@"c:\temp\instance.json", instanceText);
 
@@ -65,7 +119,7 @@ namespace StandaloneJsonValidator
             return Validate(instanceProvider, schemaProvider, formatHandlers);
         }
 
-        public static IEnumerable<JSONSchemaValidationIssue> Validate(Uri instanceLocation, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static IEnumerable<JSONError> Validate(Uri instanceLocation, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             string instanceText = Download(instanceLocation);
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(instanceLocation.ToString(), instanceText);
@@ -81,7 +135,7 @@ namespace StandaloneJsonValidator
             return Validate(instanceProvider, schemaProvider, formatHandlers);
         }
 
-        public static IEnumerable<JSONSchemaValidationIssue> Validate(Uri instanceLocation, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static IEnumerable<JSONError> Validate(Uri instanceLocation, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             string instanceText = Download(instanceLocation);
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(instanceLocation.ToString(), instanceText);

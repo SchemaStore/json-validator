@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace JSONWebValidator.Models
 {
     public class JSONFile
     {
-        [JsonProperty]
+        [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
         public JSONFileKind Kind { get; set; }
 
         [JsonProperty]

@@ -21,6 +21,12 @@ namespace JSONWebValidator
 
         public void ProcessRequest(HttpContext context)
         {
+            if (!string.Equals(context.Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
+            {
+                context.WriteResponse(new ApiError { Message = "Requests to this API must be POSTs" }, HttpStatusCode.MethodNotAllowed);
+                return;
+            }
+
             byte[] requestBody = context.Request.BinaryRead(context.Request.ContentLength);
             string requestString = Encoding.UTF8.GetString(requestBody);
             requestString = requestString.Substring(requestString.IndexOf('{'));
@@ -59,7 +65,7 @@ namespace JSONWebValidator
                 };
             }
 
-            IEnumerable<JSONSchemaValidationIssue> issues;
+            IEnumerable<JSONError> issues;
 
             switch (request.Instance.Kind)
             {
@@ -109,8 +115,10 @@ namespace JSONWebValidator
             var results = issues.Select(x => new JSONValidationError
             {
                 Message = x.Message,
-                Start = x.TargetItem.Start,
-                Length = x.TargetItem.Length
+                Start = x.Start,
+                Length = x.Length,
+                Kind = x.Kind,
+                Location = x.Location
             }).ToList();
 
             context.WriteResponse(results, HttpStatusCode.OK);
