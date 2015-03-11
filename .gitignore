@@ -1,4 +1,5 @@
-[Bb]in/
+StandaloneJsonValidator/bin/
+JsonValidationOutsideOfVs/bin/
 [Oo]bj/
 [Pp]ackages/
 .[Vv]s/

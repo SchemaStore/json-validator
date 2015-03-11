@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>JSON Validator</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Validate any JSON file against JSON Schema draft v4" />
+    <meta name="keywords" content="json, schema, validator, json schema, draft v4, online json validator" />
+    <link href="site.css" rel="stylesheet" />
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <p>JSON Validator</p>
+        </div>
+    </header>
+
+    <main role="main" class="container">
+        <h1>Validate JSON documents</h1>
+
+        <form action="#" role="application">
+            <div>
+                <label for="instance">JSON document</label>
+                <textarea id="instance" required placeholder="Paste JSON document to validate" rows="10" cols="100"></textarea>
+            </div>
+
+            <div>
+                <label for="schema">Schema</label>
+                <textarea id="schema" required placeholder="Paste JSON Schema to validate against" rows="10" cols="100"></textarea>
+            </div>
+
+            <input type="submit" value="Validate" />
+        </form>
+
+        <output></output>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Created by Mike Lorbetske and Mads Kristensen</p>
+        </div>
+    </footer>
+
+    <script src="site.js" async></script>
+</body>
+</html>

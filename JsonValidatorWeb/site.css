@@ -1,0 +1,36 @@
+﻿body {
+    font: 14px/1.2 arial;
+    padding: 0;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: block;
+}
+
+header {
+    background: #333;
+    color: white;
+    height: 60px;
+    line-height: 60px;
+    font-size: 22px;
+}
+
+    header p {
+        margin: 0;
+    }
+
+textarea {
+    width: 100%;
+}
+
+form div {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
