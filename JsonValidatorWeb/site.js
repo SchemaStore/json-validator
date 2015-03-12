@@ -106,6 +106,15 @@
     var tabString = "  ";
     var tabSize = tabString.length;
 
+    function findLineStart(text, selStart) {
+        for (var i = selStart - 1; i >= 0; --i) {
+            if (text[i] === "\n") {
+                return i + 1;
+            }
+        }
+
+        return 0;
+    }
 
     function handleEditingKeys(e) {
         var evt = event || e;
@@ -114,6 +123,8 @@
         var selStart = src.selectionStart;
         var selEnd = src.selectionEnd;
         var text = src.value;
+        var lineStart = findLineStart(text, selStart);
+        var i;
 
         switch (code) {
             case 46: //delete
@@ -121,59 +132,18 @@
                     return true;
                 }
 
-                var i;
-                for (i = selStart - 1; i >= 0; --i) {
-                    if (text[i] === "\n") {
-                        ++i;
-                        var nextNewLine = text.indexOf("\n", i);
-                        src.value = text.substr(0, i) + (nextNewLine > -1 ? text.substr(nextNewLine + 1) : "");
-                        src.setSelectionRange(i, i);
-                        break;
-                    }
-                }
-
-                if (i === -1) {
-                    var nextNewLine = text.indexOf("\n");
-
-                    if (nextNewLine === -1) {
-                        src.value = "";
-                    } else {
-                        src.value = text.substr(0, nextNewLine);
-                    }
-
-                    src.setSelectionRange(0,0);
-                    break;
-                }
-
+                var nextNewLine = text.indexOf("\n", lineStart);
+                src.value = text.substr(0, lineStart) + (nextNewLine > -1 ? text.substr(nextNewLine + 1) : "");
+                src.setSelectionRange(lineStart, lineStart);
                 break;
             case 36: //home
-                var i;
-                for (i = selStart - 1; i >= 0; --i) {
-                    if (text[i] === "\n") {
-                        ++i;
-                        for (; text[i] === " "; ++i);
+                for (i = lineStart; text[i] === " "; ++i);
 
-                        if (i === selStart) {
-                            return true;
-                        }
-
-                        src.setSelectionRange(i, i);
-                        break;
-                    }
+                if (i === selStart) {
+                    return true;
                 }
 
-                if (i === -1) {
-                    ++i;
-                    for (; text[i] === " "; ++i);
-
-                    if (i === selStart) {
-                        return true;
-                    }
-
-                    src.setSelectionRange(i, i);
-                    break;
-                }
-
+                src.setSelectionRange(i, i);
                 break;
             case 9: //tab
                 if (!evt.shiftKey) {
@@ -181,61 +151,24 @@
                     src.setSelectionRange(selStart + tabSize, selEnd + tabSize);
                 } else {
                     var distance = 0;
-                    for (var i = selStart - 1; i >= 0; --i) {
-                        if (text[i] === "\n") {
-                            var initial = i;
-                            ++i;
-                            for (; text[i] === " "; ++i, ++distance);
-                            if (distance > 0) {
-                                if (distance < tabSize) {
-                                    src.value = text.substr(0, initial) + text.substr(i);
-                                    src.setSelectionRange(selStart - distance, selEnd - distance);
-                                } else {
-                                    src.value = text.substr(0, initial + 1) + text.substr(initial + 1 + tabSize);
-                                    src.setSelectionRange(selStart - tabSize, selEnd - tabSize);
-                                }
-                            }
-
-                            break;
+                    for (i = lineStart; text[i] === " "; ++i, ++distance);
+                    if (distance > 0) {
+                        if (distance < tabSize) {
+                            src.value = text.substr(0, lineStart) + text.substr(i);
+                            src.setSelectionRange(selStart - distance, selEnd - distance);
+                        } else {
+                            src.value = text.substr(0, lineStart) + text.substr(lineStart + tabSize);
+                            src.setSelectionRange(selStart - tabSize, selEnd - tabSize);
                         }
-                    }
-
-                    if (i === -1) {
-                        ++i;
-                        for (; text[i] === " "; ++i, ++distance);
-                        if (distance > 0) {
-                            if (distance < tabSize) {
-                                src.value = text.substr(i);
-                                src.setSelectionRange(selStart - distance, selEnd - distance);
-                            } else {
-                                src.value = text.substr(tabSize);
-                                src.setSelectionRange(selStart - tabSize, selEnd - tabSize);
-                            }
-                        }
-
-                        break;
                     }
                 }
                 break;
             case 13: //return
                 //Determine indent
-                var found = false;
-                for (var i = selStart - 1; i >= 0; --i) {
-                    if (text[i] === "\n") {
-                        var pad = "";
-                        ++i;
-                        for (; text[i] === " "; ++i, pad += " ");
-                        src.value = text.substr(0, selStart) + "\n" + pad + text.substr(selEnd);
-                        src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    return true;
-                }
-
+                var pad = "";
+                for (i = lineStart; text[i] === " "; ++i, pad += " ");
+                src.value = text.substr(0, selStart) + "\n" + pad + text.substr(selEnd);
+                src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
                 break;
             default:
                 return true;
