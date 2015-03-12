@@ -16,8 +16,17 @@
         return 0;
     }
 
+    function handleReturn(src, lineStart, selStart, selEnd) {
+        //Determine indent
+        var pad = "";
+        for (var i = lineStart; src.value[i] === " "; ++i, pad += " ");
+        src.value = src.value.substr(0, selStart) + "\n" + pad + src.value.substr(selEnd);
+        src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
+        return pad.length;
+    }
+
     function handleEditingKeys(e) {
-        var evt = event || e;
+        var evt = e || event;
         var code = evt.keyCode || e.which;
         var src = evt.srcElement;
         var selStart = src.selectionStart;
@@ -26,7 +35,41 @@
         var lineStart = findLineStart(text, selStart);
         var i;
 
+        console.log(code);
+
         switch (code) {
+            case 219:
+                var open = evt.shiftKey ? "{" : "[";
+                var close = evt.shiftKey ? "}" : "]";
+                var selLen = selEnd - selStart;
+                var sel = text.substr(selStart, selLen);
+                var tail = text.substr(selEnd);
+                src.value = text.substr(0, selStart) + open;
+                var pad = handleReturn(src, lineStart, src.value.length, src.value.length);
+                var newSelStart = selStart + 1;
+                if (sel !== "") {
+                    src.value += tabString + sel;
+                    newSelStart += tabSize + 1 + pad; //make sure to account for the newline character
+                    lineStart = findLineStart(src.value, newSelStart + tabSize);
+                    handleReturn(src, lineStart, newSelStart + selLen, newSelStart + selLen);
+                    src.value = src.value.substr(0, src.value.length - tabSize); //backoff one indent
+                }
+                src.value += close + tail;
+                src.setSelectionRange(newSelStart, newSelStart + selLen);
+                break;
+            case 222:
+                var open = evt.shiftKey ? "\"" : "'";
+                var selLen = selEnd - selStart;
+                var sel = text.substr(selStart, selLen);
+                var tail = text.substr(selEnd);
+                src.value = text.substr(0, selStart) + open;
+                var newSelStart = selStart + 1;
+                if (sel !== "") {
+                    src.value += sel;
+                }
+                src.value += open + tail;
+                src.setSelectionRange(newSelStart, newSelStart + selLen);
+                break;
             case 46: //delete
                 if (!evt.shiftKey) {
                     return true;
@@ -38,12 +81,13 @@
                 break;
             case 36: //home
                 for (i = lineStart; text[i] === " "; ++i);
+                var rangeStart = i === selStart ? lineStart : i;
 
-                if (i === selStart) {
-                    return true;
+                var end = i;
+                if (evt.shiftKey) {
+                    end = selEnd;
                 }
-
-                src.setSelectionRange(i, i);
+                src.setSelectionRange(rangeStart, end);
                 break;
             case 9: //tab
                 if (!evt.shiftKey) {
@@ -64,11 +108,7 @@
                 }
                 break;
             case 13: //return
-                //Determine indent
-                var pad = "";
-                for (i = lineStart; text[i] === " "; ++i, pad += " ");
-                src.value = text.substr(0, selStart) + "\n" + pad + text.substr(selEnd);
-                src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
+                handleReturn(src, lineStart, selStart, selEnd);
                 break;
             default:
                 return true;
