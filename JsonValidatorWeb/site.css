@@ -1,14 +1,32 @@
-﻿body {
+﻿* {
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
     font: 14px/1.2 arial;
     padding: 0;
-    margin: 0;
     color: #333;
 }
+
+#wrapper {
+    min-height: 100%;
+    margin-bottom: -60px; /* Equals to footer height */
+}
+
+    #wrapper:after {
+        content: "";
+        display: block;
+        height: 60px; /* Equals to footer height */
+    }
 
 .container {
     max-width: 960px;
     margin: 0 auto;
-    display: block;
+    padding: 0 10px;
 }
 
 header {
@@ -16,21 +34,47 @@ header {
     color: white;
     height: 60px;
     line-height: 60px;
-    font-size: 22px;
 }
 
     header p {
-        margin: 0;
+        font-size: 22px;
+        font-weight: normal;
     }
 
-textarea {
-    width: 100%;
+main {
+    display: block;
+    margin-bottom: 50px;
 }
 
-form div {
+form {
+    margin-top: 50px;
     margin-bottom: 20px;
 }
 
-label {
-    font-weight: bold;
+    form div {
+        margin-bottom: 20px;
+    }
+
+    form textarea {
+        width: 100%;
+        height: 200px;
+    }
+
+    form label {
+        font-weight: bold;
+    }
+
+output {
+    display: none;
+}
+
+    output pre {
+        margin-bottom: 50px;
+    }
+
+footer {
+    clear: both;
+    background: #999;
+    line-height: 60px;
+    height: 60px;
 }

@@ -9,31 +9,34 @@
 </head>
 <body>
 
-    <header>
-        <div class="container">
-            <p>JSON Validator</p>
-        </div>
-    </header>
-
-    <main role="main" class="container">
-        <h1>Validate JSON documents</h1>
-
-        <form action="#" role="application">
-            <div>
-                <label for="instance">JSON document</label>
-                <textarea id="instance" required placeholder="Paste JSON document to validate" rows="10" cols="100"></textarea>
+    <div id="wrapper">
+        <header>
+            <div class="container">
+                <h1>JSON Schema Validator</h1>
             </div>
+        </header>
 
-            <div>
-                <label for="schema">Schema</label>
-                <textarea id="schema" required placeholder="Paste JSON Schema to validate against" rows="10" cols="100"></textarea>
-            </div>
+        <main role="main" class="container">
+            <form action="#" role="application">
+                <div>
+                    <label for="instance">JSON document</label>
+                    <textarea id="instance" required placeholder="Paste JSON document to validate" rows="10" cols="100"></textarea>
+                </div>
 
-            <input type="submit" value="Validate" />
-        </form>
+                <div>
+                    <label for="schema">Schema</label>
+                    <textarea id="schema" required placeholder="Paste JSON Schema to validate against" rows="10" cols="100"></textarea>
+                </div>
 
-        <output></output>
-    </main>
+                <input type="submit" value="Validate" />
+            </form>
+
+            <output id="result">
+                <h2>Result</h2>
+                <pre></pre>
+            </output>
+        </main>
+    </div>
 
     <footer>
         <div class="container">
