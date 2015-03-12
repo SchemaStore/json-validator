@@ -2,7 +2,8 @@
 
     var elInstance = document.getElementById("instance"),
         elSchema = document.getElementById("schema"),
-        elForm = document.querySelector("form");
+        elForm = document.querySelector("form"),
+        elCaptureTabs = document.getElementById("captureTabs");
 
     var tabString = "  ";
     var tabSize = tabString.length;
@@ -126,7 +127,7 @@
                 src.setSelectionRange(rangeStart, end);
                 break;
             case 9: //tab
-                if (src.value.length === 0) {
+                if (!elCaptureTabs.checked) {
                     handled = false;
                     break;
                 }
@@ -181,6 +182,9 @@
                     handled = false;
                     break;
                 }
+                break;
+            case 113:
+                elCaptureTabs.checked = !elCaptureTabs.checked;
                 break;
             default:
                 handled = false;
