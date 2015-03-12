@@ -58,6 +58,7 @@ main {
 form {
     margin-top: 50px;
     margin-bottom: 20px;
+    position: relative;
 }
 
     form div:first-child {
@@ -89,6 +90,41 @@ form {
     form select option:first-child {
         font-weight: bold;
     }
+
+#keyboard {
+    float: right;
+}
+
+    #keyboard a {
+        font-weight: bold;
+        text-decoration: none;
+        padding: 2px 3px;
+    }
+
+    #keyboard a:hover + dl{
+        display: block;
+    }
+
+    #keyboard dl {
+        position: absolute;
+        right: 0;
+        width: 300px;
+        background: #f1f1f1;
+        border: 1px solid gray;
+        border-radius: 3px;
+        padding: 3px 5px;
+        display: none;
+    }
+
+        #keyboard dl dt {
+            display: inline-block;
+            font-weight: bold;
+            width: 100px;
+        }
+
+        #keyboard dl dd {
+            display: inline;
+        }
 
 #result {
     display: none;
