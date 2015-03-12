@@ -16,10 +16,14 @@
         http.open("POST", "/api/v1.ashx", true);
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         http.onreadystatechange = function () {
-            if (http.readyState == 4 && http.status == 200) {
-                showErrors(JSON.parse(http.responseText));
+            if (http.readyState === 4) {
                 elInstance.disabled = false;
                 elSchema.disabled = false;
+
+                if (http.status === 200)
+                    showErrors(JSON.parse(http.responseText));
+                else
+                    alert("Could not resolve the URL");
             }
         }
         http.send(getPostObject(instance, schema));
@@ -63,11 +67,11 @@
     function getPostObject(instance, schema) {
         var obj = {
             Instance: {
-                Kind: parseJson(instance) ? "Text" : "Uri",
+                Kind: inputKind(instance),
                 Value: instance
             },
             Schema: {
-                Kind: parseJson(schema) ? "Text" : "Uri",
+                Kind: inputKind(schema),
                 Value: schema
             }
         }
@@ -76,9 +80,11 @@
     }
 
     function onInstanceChanged(e) {
-        var instance = parseJson(elInstance.value);
+        var kind = inputKind(elInstance.value);
 
-        if (instance) {
+        if (kind === "Text") {
+
+            var instance = JSON.parse(elInstance.value);
             var schema = instance.$schema;
 
             if (schema) {
@@ -86,16 +92,21 @@
             }
         }
 
-        if (instance || e.target.value.length < 2)
+        if (kind || e.target.value.length < 2)
             e.target.removeAttribute("invalid");
         else
             e.target.setAttribute("invalid", "");
-        //elSchema.disabled = instance !== null;
     }
 
-    function parseJson(string) {
+    function inputKind(string) {
+        var clean = string.trim()
+
+        if (clean.indexOf("http://") === 0 || clean.indexOf("https://") === 0)
+            return "Uri";
+
         try {
-            return JSON.parse(string);
+            JSON.parse(string);
+            return "Text";
         }
         catch (ex) {
             return null;
