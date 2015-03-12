@@ -13,7 +13,7 @@
         var schema = elSchema.value;
 
         var http = new XMLHttpRequest();
-        http.open("POST", "/api/v1.ashx", true);
+        http.open("POST", "/api/Validation/v1.ashx", true);
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         http.onreadystatechange = function () {
             if (http.readyState === 4) {

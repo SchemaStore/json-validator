@@ -1,9 +1,58 @@
 ﻿(function (undefined) {
-
     var elInstance = document.getElementById("instance"),
         elSchema = document.getElementById("schema"),
         elForm = document.querySelector("form"),
         elCaptureTabs = document.getElementById("captureTabs");
+
+    function inputKind(string) {
+        var clean = string.trim();
+
+        if (clean.indexOf("http://") === 0 || clean.indexOf("https://") === 0)
+            return "Uri";
+
+        return "Text";
+    }
+
+    function getPostObject(instance, schema, cursorPosition) {
+        var obj = {
+            Instance: {
+                Kind: inputKind(instance),
+                Value: instance
+            },
+            Schema: {
+                Kind: inputKind(schema),
+                Value: schema
+            },
+            CursorPosition: cursorPosition
+        }
+
+        return JSON.stringify(obj);
+    }
+
+    function showCompletionOptions() {
+        //TODO: This
+    }
+
+    function getCompletions(cursorPosition) {
+        var instance = elInstance.value;
+        var schema = elSchema.value;
+
+        var http = new XMLHttpRequest();
+        http.open("POST", "/api/Completion/v1.ashx", true);
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange = function () {
+            if (http.readyState === 4) {
+                elInstance.disabled = false;
+                elSchema.disabled = false;
+
+                if (http.status === 200)
+                    showCompletionOptions(JSON.parse(http.responseText));
+                else
+                    alert("Could not resolve the URL");
+            }
+        }
+        http.send(getPostObject(instance, schema, cursorPosition));
+    }
 
     var tabString = "  ";
     var tabSize = tabString.length;
@@ -158,6 +207,13 @@
                 break;
             case 113:
                 elCaptureTabs.checked = !elCaptureTabs.checked;
+                break;
+            case 32:
+                if (evt.ctrlKey) {
+                    getCompletions(selStart);
+                } else {
+                    handled = false;
+                }
                 break;
             case 13: //return
                 if (evt.ctrlKey) {
