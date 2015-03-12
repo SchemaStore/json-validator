@@ -23,7 +23,7 @@
                 if (http.status === 200)
                     showErrors(JSON.parse(http.responseText));
                 else
-                    alert("Could not resolve the URL");
+                    alert("The JSON or URL is invalid");
             }
         }
         http.send(getPostObject(instance, schema));

@@ -1,9 +1,10 @@
 ﻿(function (undefined) {
 
     var elSelect = document.getElementById("schemastore"),
-        elSchema = document.getElementById("schema");
+        elInstance = document.getElementById("instance")
+    elSchema = document.getElementById("schema");
 
-    function onChange(e) {
+    function onSelectionChange(e) {
 
         if (e.target.selectedIndex === 0)
             return;
@@ -12,6 +13,7 @@
 
         sendXhr(url, function (data) {
             elSchema.value = data;
+            saveState();
         });
     }
 
@@ -51,7 +53,26 @@
         http.send(null);
     }
 
-    elSelect.addEventListener("change", onChange, false);
-    loadSchemas();
+    function saveState() {
+        if (!localStorage) return;
 
+        localStorage["select"] = elSelect.selectedIndex;
+        localStorage["instance"] = elInstance.value;
+        localStorage["schema"] = elSchema.value;
+    }
+
+    function loadState() {
+        if (!localStorage) return;
+
+        elSelect.selectedIndex = localStorage["select"] || 0;
+        elInstance.value = localStorage["instance"] || "";
+        elSchema.value = localStorage["schema"] || "";
+    }
+
+    elSelect.addEventListener("change", onSelectionChange, false);
+    elInstance.addEventListener("keyup", saveState, false);
+    elSchema.addEventListener("keyup", saveState, false);
+
+    loadSchemas();
+    loadState();
 })();
