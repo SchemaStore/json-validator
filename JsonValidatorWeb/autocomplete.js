@@ -29,11 +29,44 @@
         return JSON.stringify(obj);
     }
 
-    function showCompletionOptions() {
-        //TODO: This
+    function showCompletionOptions(focusedBox, cursorPosition, optionsResponse) {
+        //var selectElement = document.getElementById("intellisense");
+
+        //while (selectElement.children.length > 0) {
+        //    selectElement.removeChild(selectElement.children[0]);
+        //}
+
+        for (var i = 0; i < optionsResponse.Options.length; ++i) {
+            var opt = optionsResponse.Options[i];
+            //var optElem = document.createElement("option");
+            //optElem.innerHTML = opt.DisplayText;
+            //optElem.value = opt.InsertionText;
+            //optElem.alt = optElem.title = opt.Type;
+            //selectElement.appendChild(optElem);
+        }
+
+        //focusedBox.setSelectionRange(cursorPosition, cursorPosition);
+        //focusedBox.focus();
+
+        //var newlineCount = 0;
+        //for (var i = 0; i < cursorPosition && i < focusedBox.value.length; ++i) {
+        //    if (focusedBox.value[i] === "\n") {
+        //        ++newlineCount;
+        //    }
+        //}
+
+        //var computedStyle = focusedBox.currentStyle || window.getComputedStyle(focusedBox);
+        //var lineOffset = parseInt(computedStyle.lineHeight) * newlineCount;
+        //var yOffset = focusedBox.offsetTop;
+        //var expectY = yOffset + lineOffset - focusedBox.scrollTop;
+        //selectElement.style.top = expectY + "px";
+
+        //selectElement.className = "selected";
+        //selectElement.focus();
+        //selectElement.click();
     }
 
-    function getCompletions(cursorPosition) {
+    function getCompletions(focusedBox, cursorPosition) {
         var instance = elInstance.value;
         var schema = elSchema.value;
 
@@ -46,7 +79,7 @@
                 elSchema.disabled = false;
 
                 if (http.status === 200)
-                    showCompletionOptions(JSON.parse(http.responseText));
+                    showCompletionOptions(focusedBox, cursorPosition, JSON.parse(http.responseText));
                 else
                     alert("Could not resolve the URL");
             }
@@ -210,7 +243,7 @@
                 break;
             case 32:
                 if (evt.ctrlKey) {
-                    getCompletions(selStart);
+                    getCompletions(src, selStart, selStart);
                 } else {
                     handled = false;
                 }
