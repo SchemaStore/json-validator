@@ -28,6 +28,6 @@ namespace StandaloneJsonValidator
             }
         }
 
-        public string FileName { get; }
+        public string FileName { get; set; }
     }
 }
