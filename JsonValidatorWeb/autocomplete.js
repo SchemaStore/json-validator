@@ -1,7 +1,8 @@
 ﻿(function (undefined) {
 
     var elInstance = document.getElementById("instance"),
-        elSchema = document.getElementById("schema");
+        elSchema = document.getElementById("schema"),
+        elForm = document.querySelector("form");
 
     var tabString = "  ";
     var tabSize = tabString.length;
@@ -31,14 +32,16 @@
         var src = evt.srcElement;
         var selStart = src.selectionStart;
         var selEnd = src.selectionEnd;
+        var selLen = selEnd - selStart;
         var text = src.value;
         var lineStart = findLineStart(text, selStart);
         var i;
+        var handled = true;
 
         console.log(code);
 
         switch (code) {
-            case 219:
+            case 219: // [ or {
                 var open = evt.shiftKey ? "{" : "[";
                 var close = evt.shiftKey ? "}" : "]";
                 var selLen = selEnd - selStart;
@@ -57,9 +60,8 @@
                 src.value += close + tail;
                 src.setSelectionRange(newSelStart, newSelStart + selLen);
                 break;
-            case 222:
+            case 222: // ' or "
                 var open = evt.shiftKey ? "\"" : "'";
-                var selLen = selEnd - selStart;
                 var sel = text.substr(selStart, selLen);
                 var tail = text.substr(selEnd);
                 src.value = text.substr(0, selStart) + open;
@@ -72,7 +74,8 @@
                 break;
             case 46: //delete
                 if (!evt.shiftKey) {
-                    return true;
+                    handled = false;
+                    break;
                 }
 
                 var nextNewLine = text.indexOf("\n", lineStart);
@@ -84,7 +87,8 @@
                     src.setSelectionRange(text.length, text.length);
                     break;
                 }
-                return true;
+                handled = false;
+                break;
             case 36: //home
                 if (evt.ctrlKey) {
                     src.setSelectionRange(0, 0);
@@ -113,21 +117,44 @@
                             src.setSelectionRange(selStart - distance, selEnd - distance);
                         } else {
                             src.value = text.substr(0, lineStart) + text.substr(lineStart + tabSize);
-                            src.setSelectionRange(selStart - tabSize, selEnd - tabSize);
+                            var start = Math.max(lineStart, selStart - tabSize);
+                            src.setSelectionRange(start, start + selLen);
                         }
                     }
                 }
                 break;
             case 13: //return
+                if (evt.ctrlKey) {
+                    elForm.querySelector("input").click();
+                    break;
+                }
+
                 handleReturn(src, lineStart, selStart, selEnd);
                 break;
+            case 49: //1 (expand)
+                if (!evt.altKey) {
+                    handled = false;
+                    break;
+                }
+                break;
+            case 50: //2 (contract)
+                if (!evt.altKey) {
+                    handled = false;
+                    break;
+                }
+                break;
             default:
-                return true;
+                handled = false;
+                break;
         }
 
-        evt.preventDefault();
-        evt.cancelBubble = true;
-        return false;
+        if (handled) {
+            evt.preventDefault();
+            evt.cancelBubble = true;
+            return false;
+        }
+
+        return true;
     }
 
     elInstance.addEventListener("keydown", handleEditingKeys, true);
