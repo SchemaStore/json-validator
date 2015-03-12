@@ -7,5 +7,11 @@ namespace JSONWebValidator.Models
     {
         [JsonProperty]
         public List<JSONValidationError> Errors { get; set; }
+
+        [JsonProperty]
+        public string InstanceDocumentText { get; set; }
+
+        [JsonProperty]
+        public string SchemaText { get; set; }
     }
 }

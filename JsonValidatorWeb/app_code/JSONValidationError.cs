@@ -20,11 +20,5 @@ namespace JSONWebValidator.Models
 
         [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
         public JSONErrorLocation Location { get; set; }
-
-        [JsonProperty]
-        public string InstanceDocumentText { get; set; }
-
-        [JsonProperty]
-        public string SchemaText { get; set; }
     }
 }

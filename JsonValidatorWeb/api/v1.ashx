@@ -63,7 +63,7 @@ public class v1 : IHttpHandler
             };
         }
 
-        IEnumerable<JSONError> issues;
+        ValidationResult issues;
 
         switch (request.Instance.Kind)
         {
@@ -110,21 +110,24 @@ public class v1 : IHttpHandler
                 return;
         }
 
-        string instanceText = request.Instance.Kind == JSONFileKind.Uri ? JsonValidator.Download(new Uri(request.Instance.Value, UriKind.Absolute)) : request.Instance.Value;
-        string schemaText = request.Schema.Kind == JSONFileKind.Uri ? JsonValidator.Download(new Uri(request.Schema.Value, UriKind.Absolute)) : request.Schema.Value;
+        var response = new JSONValidationResponse
+        {
+            SchemaText = issues.SchemaText,
+            InstanceDocumentText = issues.InstanceDocumentText
+        };
 
-        var results = issues.Select(x => new JSONValidationError
+        var results = issues.Errors.Select(x => new JSONValidationError
         {
             Message = x.Message,
             Start = x.Start,
             Length = x.Length,
             Kind = x.Kind,
             Location = x.Location,
-            InstanceDocumentText = instanceText,
-            SchemaText = schemaText
         }).ToList();
 
-        context.WriteResponse(results, HttpStatusCode.OK);
+        response.Errors = results;
+
+        context.WriteResponse(response, HttpStatusCode.OK);
     }
 
     private static readonly IEnumerable<IJSONSchemaFormatHandler> FormatHandlers = new IJSONSchemaFormatHandler[] { new DateTimeValidator(), new EmailValidator(), new HostNameValidator(), new InternetProtocolAddressV4Validator(), new InternetProtocolAddressV6Validator(), new RegexValidator(), new UriValidator(), new UrlValidator() };

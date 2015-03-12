@@ -35,8 +35,8 @@
         var errors = JSON.parse(result);
         var string = "";
 
-        for (var i = errors.length - 1; i >= 0; i--) {
-            var error = errors[i];
+        for (var i = errors.Errors.length - 1; i >= 0; i--) {
+            var error = errors.Errors[i];
             var start = error.Start;
             var tooltip = error.Message.replace(/"/gi, "&quot;");
 
@@ -47,13 +47,13 @@
         elPre.innerHTML = instance;
         location.href = "#result";
 
-        elOutput.querySelector("ol").innerHTML = errors.map(function (err) {
+        elOutput.querySelector("ol").innerHTML = errors.Errors.map(function (err) {
             return "<li><span>position:" + err.Start + ", length:" + err.Length + "</span><pre>" + err.Message + "</pre></li>"
         })
 
-        if (errors.length > 0) {
+        if (errors.Errors.length > 0) {
             elOutput.firstElementChild.style.color = "red";
-            elOutput.firstElementChild.innerHTML = errors.length + " error(s)";
+            elOutput.firstElementChild.innerHTML = errors.Errors.length + " error(s)";
         }
         else {
             elOutput.firstElementChild.style.color = "green";
