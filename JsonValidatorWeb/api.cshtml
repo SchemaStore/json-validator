@@ -4,16 +4,158 @@
     Page.Description = "The JSON Validator API is a REST service for validation and completion based on JSON Schema Draft v4";
 }
 
+<script type="text/javascript">
+    function nav(e) {
+        document.getElementById(e.href.split('#')[1]).scrollIntoView();
+        return false;
+    }
+</script>
+
 <article>
-    <h2>Some headline</h2>
+    <h2>API Documentation</h2>
 
     <p>
-        Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+        Supported operations against the Schema Store JSON Validator
     </p>
 
-    <h3>some sub header</h3>
+    <br />
 
-    <p>
-        Mi, id sollicitudin urna fermentum ut fusce varius nisl ac ipsum gravida vel pretium tellus.
-    </p>
+    <div>
+        <strong id="jump">Jump to...</strong>
+        <small>
+            <div class="navTopicContainer">
+                <a href="#v1_validate" onclick=" nav(this) ">v1</a>
+                <div class="navTopicContainer">
+                    <a href="#v1_validate" onclick=" nav(this) ">Validation</a><br />
+                    <a href="#v1_complete" onclick=" nav(this) ">Completion</a>
+                </div>
+            </div>
+        </small>
+    </div>
+
+    <br />
+
+    <div class="apiContainer">
+        <small><a href="#jump" class="backToTop" onclick="nav(this)">Top</a></small>
+        <h2 id="v1_validate" class="functionArea">Validation</h2>&nbsp;<h1 class="functionArea">v1</h1>
+        <div class="apiTopic">
+            <h5 class="apiMethod">Location:</h5>&nbsp;<code>api/Validation/v1.ashx?version=4</code><br/>
+            <h5 class="apiMethod">Method:</h5>&nbsp;<code>POST</code>
+            <h5>Query String:</h5>
+            <div class="apiMessage">
+                <b><code>version</code></b>&nbsp;<i>(Optional)</i>
+                <p>
+                    In a schema-only submission, the version to validate the schema as.<br />
+                    Allowed value(s): <b>4</b>
+                </p>
+            </div>
+            <h5>Request Body:</h5>
+            <code lang="application/json" class="apiMessage">
+                {<br />
+                &nbsp;&nbsp;"Instance": {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Kind": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Value": "..."<br />
+                &nbsp;&nbsp;},<br />
+                &nbsp;&nbsp;"Schema": {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Kind": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Value": "..."<br />
+                &nbsp;&nbsp;}<br />
+                }
+            </code>
+            <strong>Parameters:</strong>
+            <div class="apiMessage">
+                <h5>#/Instance/Kind</h5><span>Either "Uri" or "Text", indicates whether the instance document is represented as a URI to the content or the content itself</span>
+                <h5>#/Instance/Value</h5><span>Either a URI to the instance document to use or the contents of the document itself, depending on the value of the <code>Kind</code> parameter</span>
+                <h5>#/Schema/Kind</h5><span>Either "Uri" or "Text", indicates whether the schema to apply to the instance document is represented as a URI to the content or the content itself</span>
+                <h5>#/Schema/Value</h5><span>Either a URI to the schema to apply to the instance document or the contents of the document itself, depending on the value of the <code>Kind</code> parameter</span>
+            </div>
+            <strong>Response Body:</strong>
+            <code lang="application/json" class="apiMessage">
+                {<br />
+                &nbsp;&nbsp;"InstanceDocumentText": "..."<br />
+                &nbsp;&nbsp;"SchemaText": "...",<br />
+                &nbsp;&nbsp;"Errors": [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;{<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Message": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Length": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Start": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Kind": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Location": "..."<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+                &nbsp;&nbsp;]<br />
+                }
+            </code>
+            <strong>Fields:</strong>
+            <div class="apiMessage">
+                <h5>#/InstanceDocumentText</h5><span>The text of the instance document that has been validated</span>
+                <h5>#/SchemaText</h5><span>The text of the schema the instance document was validated against</span>
+                <h5>#/Errors</h5><span>The collection of errors found during validation</span>
+                <h5>#/Errors/<i>n</i>/Message</h5><span>A description of the problem found</span>
+                <h5>#/Errors/<i>n</i>/Start</h5><span>The beginning position within the instance document text where the error applies</span>
+                <h5>#/Errors/<i>n</i>/Length</h5><span>The length of the text in the instance document the error applies to</span>
+                <h5>#/Errors/<i>n</i>/Kind</h5><span>Either "Syntax" or "Validation" - describing the nature of the error found</span>
+                <h5>#/Errors/<i>n</i>/Location</h5><span>Either "InstanceDocument" or "Schema" - indicating which document the problem was found in</span><br />
+                <strong>Success Status:</strong>&nbsp;<code>200 (OK)</code><br />
+                <strong>Content-Type:</strong>&nbsp;<code>application/json</code><br />
+                <strong>Content-Encoding:</strong>&nbsp;<code>UTF-8</code>
+            </div>
+        </div>
+        <br />
+
+        <h2 id="v1_complete" class="functionArea">Completion</h2>&nbsp;<h1 class="functionArea">v1</h1>
+        <div class="apiTopic">
+            <small><a href="#jump" class="backToTop" onclick="nav(this)">Top</a></small>
+            <h5>Query String:</h5>
+            <div class="apiContainer apiMessage">
+                <i>(None)</i>
+            </div>
+            <h5 class="apiMethod">Method:</h5>&nbsp;<code>POST</code><br/>
+            <h5 class="apiMethod">Location:</h5>&nbsp;<code>api/Completion/v1.ashx</code>
+            <h5>Request Body:</h5>
+            <code lang="application/json" class="apiMessage">
+                {<br />
+                &nbsp;&nbsp;"Instance": {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Kind": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Value": "..."<br />
+                &nbsp;&nbsp;},<br />
+                &nbsp;&nbsp;"Schema": {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Kind": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;"Value": "..."<br />
+                &nbsp;&nbsp;}<br />
+                &nbsp;&nbsp;"CursorPosition": 0<br />
+                }
+            </code><br />
+            <strong>Parameters:</strong>
+            <div class="apiMessage">
+                <h5>#/Instance/Kind</h5><span>Either "Uri" or "Text", indicates whether the instance document is represented as a URI to the content or the content itself</span>
+                <h5>#/Instance/Value</h5><span>Either a URI to the instance document to use or the contents of the document itself, depending on the value of the <code>Kind</code> parameter</span>
+                <h5>#/Schema/Kind</h5><span>Either "Uri" or "Text", indicates whether the schema to apply to the instance document is represented as a URI to the content or the content itself</span>
+                <h5>#/Schema/Value</h5><span>Either a URI to the schema to apply to the instance document or the contents of the document itself, depending on the value of the <code>Kind</code> parameter</span>
+                <h5>#/CursorPosition</h5><span>The position of the cursor within the source text (offset from the beginning) at which completion options are desired</span>
+            </div>
+            <strong>Response Body:</strong>
+            <code lang="application/json" class="apiMessage">
+                {<br />
+                &nbsp;&nbsp;"Options": [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;{<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"DisplayText": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Type": "...",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"InsertionText": "..."<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+                &nbsp;&nbsp;]<br />
+                }
+            </code><br />
+            <strong>Fields:</strong>
+            <div class="apiMessage">
+                <h5>#/Options</h5><span>The collection of options that apply to the element the cursor is in</span>
+                <h5>#/Options/<i>n</i>/DisplayText</h5><span>How to present the option to the user</span>
+                <h5>#/Options/<i>n</i>/Type</h5><span>Currently used to display the <code>format</code> property that applies to the option</span>
+                <h5>#/Options/<i>n</i>/InsertionText</h5><span>The literal value to insert into the document if chosen</span><br />
+                <strong>Success Status:</strong>&nbsp;<code>200 (OK)</code><br />
+                <strong>Content-Type:</strong>&nbsp;<code>application/json</code><br />
+                <strong>Content-Encoding:</strong>&nbsp;<code>UTF-8</code>
+            </div>
+        </div>
+    </div>
+    <small><a href="#jump" class="backToTop" onclick="nav(this)">Top</a></small>
 </article>

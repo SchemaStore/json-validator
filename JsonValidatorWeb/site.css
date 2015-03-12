@@ -182,3 +182,36 @@ footer {
     footer a {
         color: inherit;
     }
+
+.functionArea {
+    display: inline;
+    clear: both;
+}
+
+.backToTop {
+    float: right;
+    clear: both;
+}
+
+.apiContainer {
+    padding: 5px;
+}
+
+.apiMessage {
+    display: block;
+    padding: 5px;
+    border: solid black 1px;
+}
+
+.apiTopic {
+    padding: 5px;
+    border: dashed darkgray 1px;
+}
+
+.navTopicContainer {
+    margin-left: 10px;
+}
+
+.apiMethod {
+    display: inline-block;
+}
