@@ -48,7 +48,7 @@
 
         elOutput.style.display = "block";
         elPre.innerHTML = instance;
-        location.href = "#result";
+        elOutput.scrollIntoView();
 
         elOutput.querySelector("ol").innerHTML = result.Errors.map(function (err) {
             return "<li><span>position:" + err.Start + ", length:" + err.Length + "</span><pre>" + err.Message + "</pre></li>"
@@ -83,19 +83,24 @@
         var kind = inputKind(elInstance.value);
 
         if (kind === "Text") {
-
             var instance = JSON.parse(elInstance.value);
             var schema = instance.$schema;
-
-            if (schema) {
-                elSchema.value = schema;
-            }
+            elSchema.value = schema ? schema : elSchema.value;
         }
 
-        if (kind || e.target.value.length < 2)
-            e.target.removeAttribute("invalid");
+        syntaxValidate(e.target, kind);
+    }
+
+    function onSchemaChanged(e) {
+        var kind = inputKind(e.target.value);
+        syntaxValidate(e.target, kind)
+    }
+
+    function syntaxValidate(textarea, kind) {
+        if (kind || textarea.value.length < 2)
+            textarea.removeAttribute("invalid");
         else
-            e.target.setAttribute("invalid", "");
+            textarea.setAttribute("invalid", "");
     }
 
     function inputKind(string) {
@@ -115,5 +120,6 @@
 
     elForm.addEventListener("submit", onSubmit, false);
     elInstance.addEventListener("keyup", onInstanceChanged, false);
+    elSchema.addEventListener("keyup", onSchemaChanged, false);
 
 })();
