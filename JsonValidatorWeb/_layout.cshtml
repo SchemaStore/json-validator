@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@Page.Title</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="@Page.Description" />
+    <meta name="keywords" content="json, schema, validator, json schema, draft v4, online json validator" />
+    <link href="site.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div id="wrapper">
+        <header>
+            <div class="container">
+                <h1>JSON Schema Validator</h1>
+            </div>
+        </header>
+
+        <main role="main" class="container">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Created by <a href="http://twitter.com/mlorbetske">Mike Lorbetske</a> and <a href="http://twitter.com/mkristensen">Mads Kristensen</a></p>
+        </div>
+    </footer>
+
+    @RenderSection("Scripts", false)
+</body>
+</html>

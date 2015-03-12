@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "~/_layout.cshtml";
+    Page.Title = "JSON Validator";
+    Page.Description = "Validate any JSON file against JSON Schema draft v4";
+}
+
+<form action="#" role="application">
+    <div>
+        <label for="captureTabs" accesskey="F2">Capture tabs</label>
+        <input type="checkbox" id="captureTabs" />
+    </div>
+
+    <div>
+        <label for="instance">JSON document:</label>
+        <textarea id="instance" required spellcheck="false" placeholder="A JSON document or a URL pointing to one" rows="10" cols="100"></textarea>
+    </div>
+
+    <div>
+        <label for="schemastore">Select schema</label>
+        <select id="schemastore">
+            <option>SchemaStore.org</option>
+        </select>
+        <label for="schema">or type it:</label>
+        <textarea id="schema" required spellcheck="false" placeholder="JSON Schema to validate against or a URL pointing to one" rows="10" cols="100"></textarea>
+    </div>
+
+    <input type="submit" value="Validate" />
+</form>
+
+<div id="result">
+    <h2>Result</h2>
+    <ol></ol>
+    <h3>Source code</h3>
+    <pre></pre>
+</div>
+
+@section Scripts {
+    <script src="/js/site.js" async></script>
+    <script src="/js/schemastore.js" async></script>
+    <script src="/js/autocomplete.js" async></script>
+}

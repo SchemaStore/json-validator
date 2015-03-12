@@ -12,6 +12,11 @@ body {
     color: #333;
 }
 
+h2, h3 {
+    margin-top: 30px;
+    font-weight: normal;
+}
+
 #wrapper {
     min-height: 100%;
     margin-bottom: -60px; /* Equals to footer height */
@@ -46,6 +51,10 @@ main {
     margin-bottom: 50px;
 }
 
+    main article {
+        margin-top: 50px;
+    }
+
 form {
     margin-top: 50px;
     margin-bottom: 20px;
@@ -55,9 +64,9 @@ form {
         float: right;
     }
 
-    form div:first-child label{
-        font-weight: normal;
-    }
+        form div:first-child label {
+            font-weight: normal;
+        }
 
     form div:nth-child(2) {
         margin-bottom: 20px;
