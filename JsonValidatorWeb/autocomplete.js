@@ -79,11 +79,22 @@
                 src.value = text.substr(0, lineStart) + (nextNewLine > -1 ? text.substr(nextNewLine + 1) : "");
                 src.setSelectionRange(lineStart, lineStart);
                 break;
+            case 35:
+                if (evt.ctrlKey) {
+                    src.setSelectionRange(text.length, text.length);
+                    break;
+                }
+                return true;
             case 36: //home
+                if (evt.ctrlKey) {
+                    src.setSelectionRange(0, 0);
+                    break;
+                }
+
                 for (i = lineStart; text[i] === " "; ++i);
                 var rangeStart = i === selStart ? lineStart : i;
 
-                var end = i;
+                var end = rangeStart;
                 if (evt.shiftKey) {
                     end = selEnd;
                 }
