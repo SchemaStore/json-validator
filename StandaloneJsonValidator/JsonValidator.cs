@@ -93,7 +93,7 @@ namespace StandaloneJsonValidator
             return Validate(instanceProvider, schemaProvider, formatHandlers);
         }
 
-        private static string Download(Uri location)
+        public static string Download(Uri location)
         {
             HttpWebRequest request = WebRequest.CreateHttp(location);
             using (WebResponse response = request.GetResponse())
