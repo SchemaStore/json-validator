@@ -23,12 +23,18 @@
         var pad = "";
         for (var i = lineStart; src.value[i] === " "; ++i, pad += " ");
 
-        if (prevBraceFound) {
-            pad += tabString;
+        if (selStart > lineStart + pad.length - 1) {
+            if (prevBraceFound) {
+                pad += tabString;
+            }
+
+            src.value = src.value.substr(0, selStart) + "\n" + pad + src.value.substr(selEnd);
+            src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
+        } else {
+            src.value = src.value.substr(0, lineStart) + "\n" + src.value.substr(lineStart);
+            src.setSelectionRange(selStart + 1, selStart + 1);
         }
 
-        src.value = src.value.substr(0, selStart) + "\n" + pad + src.value.substr(selEnd);
-        src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
         return pad.length;
     }
 
@@ -84,21 +90,16 @@
 
                     if (selEnd < text.length && text[selEnd] === '\n') {
                         ++selEnd;
+                        var allWhitespace = true;
                         var nextNewLine = text.indexOf("\n", selEnd);
-                        for (i = selEnd; i < text.length; ++i) {
-                            if (text[i] === " ") {
-                                continue;
-                            }
-                            if (text[i] === "\n") {
-                                if (nextNewLine !== i) {
-                                    break;
-                                }
+                        for (i = selEnd; allWhitespace && i < nextNewLine; ++i) {
+                            allWhitespace = text[i] === " ";
+                        }
 
-                                handled = true;
-                                src.value = text.substr(0, selStart) + text.substr(nextNewLine);
-                                src.setSelectionRange(selStart, selStart);
-                                break;
-                            }
+                        if (allWhitespace) {
+                            handled = true;
+                            src.value = text.substr(0, selStart) + text.substr(nextNewLine);
+                            src.setSelectionRange(selStart, selStart);
                         }
                     }
 
