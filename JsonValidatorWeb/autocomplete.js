@@ -155,9 +155,12 @@
                     }
                 }
                 break;
+            case 113:
+                elCaptureTabs.checked = !elCaptureTabs.checked;
+                break;
             case 13: //return
                 if (evt.ctrlKey) {
-                    elForm.querySelector("input").click();
+                    elForm.querySelector("input[type=submit]").click();
                     break;
                 }
 
@@ -187,9 +190,6 @@
                     handled = false;
                     break;
                 }
-                break;
-            case 113:
-                elCaptureTabs.checked = !elCaptureTabs.checked;
                 break;
             default:
                 handled = false;
