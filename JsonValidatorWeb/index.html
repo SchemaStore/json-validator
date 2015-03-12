@@ -19,6 +19,11 @@
         <main role="main" class="container">
             <form action="#" role="application">
                 <div>
+                    <label for="captureTabs" accesskey="F2">Capture tabs</label>
+                    <input type="checkbox" id="captureTabs" />
+                </div>
+
+                <div>
                     <label for="instance">JSON document:</label>
                     <textarea id="instance" required spellcheck="false" placeholder="A JSON document or a URL pointing to one" rows="10" cols="100"></textarea>
                 </div>
@@ -30,11 +35,6 @@
                     </select>
                     <label for="schema">or type it:</label>
                     <textarea id="schema" required spellcheck="false" placeholder="JSON Schema to validate against or a URL pointing to one" rows="10" cols="100"></textarea>
-                </div>
-
-                <div>
-                    <label for="captureTabs" accesskey="F2">Capture tabs</label>
-                    <input type="checkbox" id="captureTabs"/>
                 </div>
 
                 <input type="submit" value="Validate" />

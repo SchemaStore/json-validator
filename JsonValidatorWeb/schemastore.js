@@ -10,31 +10,41 @@
 
         var url = e.target.options[e.target.selectedIndex].value;
 
+        sendXhr(url, function (data) {
+            elSchema.value = data;
+        });
+    }
+
+    function loadSchemas() {
+
+        sendXhr("http://schemastore.org/api/json/catalog.json", function (data) {
+            var schemas = JSON.parse(data);
+
+            for (var i = 0; i < schemas.schemas.length; i++) {
+                var schema = schemas.schemas[i];
+                var option = document.createElement("option");
+                option.value = schema.url;
+                option.innerHTML = schema.name;
+                elSelect.appendChild(option);
+            }
+        });
+    }
+
+    function sendXhr(url, callback) {
+
+        if (sessionStorage && sessionStorage[url]) {
+            callback(sessionStorage[url]);
+            return;
+        }
+
         var http = new XMLHttpRequest();
         http.open("GET", url, true);
         http.onreadystatechange = function () {
             if (http.readyState === 4 && http.status === 200) {
-                elSchema.value = http.responseText;
-            }
-        }
+                callback(http.responseText);
 
-        http.send(null);
-    }
-
-    function loadSchemas() {
-        var http = new XMLHttpRequest();
-        http.open("GET", "http://schemastore.org/api/json/catalog.json", true);
-        http.onreadystatechange = function () {
-            if (http.readyState === 4 && http.status === 200) {
-                var schemas = JSON.parse(http.responseText);
-
-                for (var i = 0; i < schemas.schemas.length; i++) {
-                    var schema = schemas.schemas[i];
-                    var option = document.createElement("option");
-                    option.value = schema.url;
-                    option.innerHTML = schema.name;
-                    elSelect.appendChild(option);
-                }
+                if (http.status === 200 && sessionStorage)
+                    sessionStorage[url] = http.responseText;
             }
         }
 

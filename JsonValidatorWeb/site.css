@@ -52,6 +52,14 @@ form {
 }
 
     form div:first-child {
+        float: right;
+    }
+
+    form div:first-child label{
+        font-weight: normal;
+    }
+
+    form div:nth-child(2) {
         margin-bottom: 20px;
     }
 
@@ -69,7 +77,7 @@ form {
         font-weight: bold;
     }
 
-    form select option:first-child{
+    form select option:first-child {
         font-weight: bold;
     }
 
@@ -99,6 +107,6 @@ footer {
     text-align: right;
 }
 
-footer a {
-    color: inherit;
-}
+    footer a {
+        color: inherit;
+    }
