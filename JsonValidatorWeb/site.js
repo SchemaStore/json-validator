@@ -17,7 +17,7 @@
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         http.onreadystatechange = function () {
             if (http.readyState == 4 && http.status == 200) {
-                showErrors(http.responseText, instance);
+                showErrors(JSON.parse(http.responseText));
                 elInstance.disabled = false;
                 elSchema.disabled = false;
             }
@@ -31,12 +31,11 @@
     /**
      * @param {string} instance
      */
-    function showErrors(result, instance) {
-        var errors = JSON.parse(result);
-        var string = "";
+    function showErrors(result) {
+        var instance = result.InstanceDocumentText;
 
-        for (var i = errors.Errors.length - 1; i >= 0; i--) {
-            var error = errors.Errors[i];
+        for (var i = result.Errors.length - 1; i >= 0; i--) {
+            var error = result.Errors[i];
             var start = error.Start;
             var tooltip = error.Message.replace(/"/gi, "&quot;");
 
@@ -47,13 +46,13 @@
         elPre.innerHTML = instance;
         location.href = "#result";
 
-        elOutput.querySelector("ol").innerHTML = errors.Errors.map(function (err) {
+        elOutput.querySelector("ol").innerHTML = result.Errors.map(function (err) {
             return "<li><span>position:" + err.Start + ", length:" + err.Length + "</span><pre>" + err.Message + "</pre></li>"
         })
 
-        if (errors.Errors.length > 0) {
+        if (result.Errors.length > 0) {
             elOutput.firstElementChild.style.color = "red";
-            elOutput.firstElementChild.innerHTML = errors.Errors.length + " error(s)";
+            elOutput.firstElementChild.innerHTML = result.Errors.length + " error(s)";
         }
         else {
             elOutput.firstElementChild.style.color = "green";
