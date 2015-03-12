@@ -25,13 +25,15 @@
     }
 
     function getPostObject(instance, schema) {
+        var instanceContents = parseJson(elInstance.value);
+        var kind = instanceContents.$schema ? "Uri" : "Text";
         var obj = {
             Instance: {
                 Kind: "Text",
                 Value: instance
             },
             Schema: {
-                Kind: "Uri",
+                Kind: kind,
                 Value: schema
             }
         }
