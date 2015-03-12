@@ -44,7 +44,7 @@
         var i;
         var handled = true;
 
-        console.log(code);
+        //console.log(code);
 
         switch (code) {
             case 219: // [ or {
