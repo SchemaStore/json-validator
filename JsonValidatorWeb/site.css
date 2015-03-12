@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    font: 14px/1.2 arial;
+    font: 16px/1.5em "Segoe UI","Segoe WP Light","Segoe WP",Tahoma,Arial,sans-serif;
     padding: 0;
     color: #333;
 }
@@ -30,14 +30,14 @@ body {
 }
 
 header {
-    background: #333;
+    background: #555;
     color: white;
     height: 60px;
     line-height: 60px;
 }
 
     header h1 {
-        font-size: 22px;
+        font-size: 1.9em;
         font-weight: normal;
     }
 
@@ -51,7 +51,7 @@ form {
     margin-bottom: 20px;
 }
 
-    form div {
+    form div:first-child {
         margin-bottom: 20px;
     }
 
@@ -66,6 +66,10 @@ form {
         }
 
     form label {
+        font-weight: bold;
+    }
+
+    form select option:first-child{
         font-weight: bold;
     }
 
@@ -88,7 +92,13 @@ form {
 
 footer {
     clear: both;
-    background: #999;
+    color: #333;
     line-height: 60px;
     height: 60px;
+    font-size: 90%;
+    text-align: right;
+}
+
+footer a {
+    color: inherit;
 }

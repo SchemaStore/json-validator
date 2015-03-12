@@ -20,16 +20,16 @@
             <form action="#" role="application">
                 <div>
                     <label for="instance">JSON document:</label>
-                    <textarea id="instance" required spellcheck="false" placeholder="Paste JSON document to validate" rows="10" cols="100"></textarea>
+                    <textarea id="instance" required spellcheck="false" placeholder="A JSON document or a URL pointing to one" rows="10" cols="100"></textarea>
                 </div>
 
                 <div>
                     <label for="schemastore">Select schema</label>
                     <select id="schemastore">
-                        <optgroup label="SchemaStore.org"></optgroup>
+                        <option>SchemaStore.org</option>
                     </select>
                     <label for="schema">or type it:</label>
-                    <textarea id="schema" required spellcheck="false" placeholder="Paste JSON Schema to validate against or a URL pointing to one" rows="10" cols="100"></textarea>
+                    <textarea id="schema" required spellcheck="false" placeholder="JSON Schema to validate against or a URL pointing to one" rows="10" cols="100"></textarea>
                 </div>
 
                 <input type="submit" value="Validate" />
@@ -46,7 +46,7 @@
 
     <footer>
         <div class="container">
-            <p>Created by Mike Lorbetske and Mads Kristensen</p>
+            <p>Created by <a href="http://twitter.com/mlorbetske">Mike Lorbetske</a> and <a href="http://twitter.com/mkristensen">Mads Kristensen</a></p>
         </div>
     </footer>
 
