@@ -47,7 +47,7 @@ header {
     }
 
 nav {
-    background: gray;
+    background: #ff8d00;
     width: 100%;
 }
 
@@ -66,6 +66,7 @@ nav {
             margin-right: 20px;
             padding: 3px 0;
             display: inline-block;
+            font-weight: 600;
         }
 
         nav li a:hover {
