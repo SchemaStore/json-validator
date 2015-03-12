@@ -98,12 +98,19 @@ namespace StandaloneJsonValidator
 
         public static string Download(Uri location)
         {
-            HttpWebRequest request = WebRequest.CreateHttp(location);
-            using (WebResponse response = request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 8192, true))
+            try
             {
-                return reader.ReadToEnd();
+                HttpWebRequest request = WebRequest.CreateHttp(location);
+                using (WebResponse response = request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 8192, true))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            catch (WebException)
+            {
+                return string.Empty;
             }
         }
 
