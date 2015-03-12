@@ -17,10 +17,15 @@
         return 0;
     }
 
-    function handleReturn(src, lineStart, selStart, selEnd) {
+    function handleReturn(src, lineStart, selStart, selEnd, prevBraceFound) {
         //Determine indent
         var pad = "";
         for (var i = lineStart; src.value[i] === " "; ++i, pad += " ");
+
+        if (prevBraceFound) {
+            pad += tabString;
+        }
+
         src.value = src.value.substr(0, selStart) + "\n" + pad + src.value.substr(selEnd);
         src.setSelectionRange(selStart + pad.length + 1, selStart + pad.length + 1);
         return pad.length;
@@ -75,6 +80,22 @@
             case 46: //delete
                 if (!evt.shiftKey) {
                     handled = false;
+                    var nextNewLine = text.indexOf("\n", selEnd);
+                    for (i = selEnd; i < text.length; ++i) {
+                        if (text[i] === " ") {
+                            continue;
+                        }
+                        if (text[i] === "\n") {
+                            if (nextNewLine !== i) {
+                                break;
+                            }
+
+                            handled = true;
+                            src.value = text.substr(0, selStart) + text.substr(nextNewLine);
+                            src.setSelectionRange(selStart, selStart);
+                        }
+                    }
+
                     break;
                 }
 
@@ -105,6 +126,11 @@
                 src.setSelectionRange(rangeStart, end);
                 break;
             case 9: //tab
+                if (src.value.length === 0) {
+                    handled = false;
+                    break;
+                }
+
                 if (!evt.shiftKey) {
                     src.value = text.substr(0, selStart) + tabString + text.substr(selStart);
                     src.setSelectionRange(selStart + tabSize, selEnd + tabSize);
@@ -129,7 +155,20 @@
                     break;
                 }
 
-                handleReturn(src, lineStart, selStart, selEnd);
+                var prevBraceFound = false;
+                for (i = selStart - 1; i >= 0; --i) {
+                    if (text[i] === ' ') {
+                        continue;
+                    }
+
+                    if (text[i] === '{' || text[i] === '[') {
+                        prevBraceFound = true;
+                    }
+
+                    break;
+                }
+
+                handleReturn(src, lineStart, selStart, selEnd, prevBraceFound);
                 break;
             case 49: //1 (expand)
                 if (!evt.altKey) {
