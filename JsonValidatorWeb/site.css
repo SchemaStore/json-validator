@@ -36,7 +36,7 @@ header {
     line-height: 60px;
 }
 
-    header p {
+    header h1 {
         font-size: 22px;
         font-weight: normal;
     }
@@ -60,15 +60,28 @@ form {
         height: 200px;
     }
 
+        form textarea[invalid] {
+            background: #ffb6b6;
+        }
+
     form label {
         font-weight: bold;
     }
 
-output {
+#result {
     display: none;
 }
 
-    output pre {
+    #result ol {
+        margin: 20px 0;
+        padding-left: 20px;
+    }
+
+        #result ol span {
+            font-style: italic;
+        }
+
+    #result > pre {
         margin-bottom: 50px;
     }
 

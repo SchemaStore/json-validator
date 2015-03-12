@@ -1,7 +1,7 @@
 ﻿(function (undefined) {
 
-    var elOutput = document.querySelector("output"),
-        elPre = document.querySelector("pre")
+    var elOutput = document.getElementById("result"),
+        elPre = document.querySelector("pre"),
         elInstance = document.getElementById("instance"),
         elSchema = document.getElementById("schema"),
         elForm = document.querySelector("form");
@@ -44,15 +44,18 @@
         }
 
         elOutput.style.display = "block";
+        elPre.innerHTML = instance;
         location.href = "#result";
 
+        elOutput.querySelector("ol").innerHTML = errors.map(function (err) {
+            return "<li><span>position:" + err.Start + ", length:" + err.Length + "</span><pre>" + err.Message + "</pre></li>"
+        })
+
         if (errors.length > 0) {
-            elPre.innerHTML = instance;
             elOutput.firstElementChild.style.color = "red";
-            elOutput.firstElementChild.innerHTML = errors.length +  " error(s)";
+            elOutput.firstElementChild.innerHTML = errors.length + " error(s)";
         }
         else {
-            elPre.innerHTML = "";
             elOutput.firstElementChild.style.color = "green";
             elOutput.firstElementChild.innerHTML = "0 errors";
         }
@@ -84,6 +87,10 @@
             }
         }
 
+        if (instance || e.target.value.length < 2)
+            e.target.removeAttribute("invalid");
+        else
+            e.target.setAttribute("invalid", "");
         //elSchema.disabled = instance !== null;
     }
 
@@ -97,6 +104,6 @@
     }
 
     elForm.addEventListener("submit", onSubmit, false);
-    elInstance.addEventListener("change", onInstanceChanged, false);
+    elInstance.addEventListener("keyup", onInstanceChanged, false);
 
 })();

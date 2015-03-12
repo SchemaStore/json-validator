@@ -25,16 +25,18 @@
 
                 <div>
                     <label for="schema">Schema</label>
-                    <textarea id="schema" required placeholder="Paste JSON Schema to validate against" rows="10" cols="100"></textarea>
+                    <textarea id="schema" required placeholder="Paste JSON Schema to validate against or a URL pointing to one" rows="10" cols="100"></textarea>
                 </div>
 
                 <input type="submit" value="Validate" />
             </form>
 
-            <output id="result">
+            <div id="result">
                 <h2>Result</h2>
+                <ol></ol>
+                <h3>Source code</h3>
                 <pre></pre>
-            </output>
+            </div>
         </main>
     </div>
 
