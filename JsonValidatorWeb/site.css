@@ -37,14 +37,40 @@ h2, h3 {
 header {
     background: #555;
     color: white;
-    height: 60px;
-    line-height: 60px;
 }
 
     header h1 {
         font-size: 1.9em;
         font-weight: normal;
+        height: 60px;
+        line-height: 60px;
     }
+
+nav {
+    background: gray;
+    width: 100%;
+}
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    nav li {
+        display: inline;
+    }
+
+        nav li a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 3px 0;
+            display: inline-block;
+        }
+
+        nav li a:hover {
+            text-decoration: underline;
+        }
 
 main {
     display: block;
@@ -101,9 +127,9 @@ form {
         padding: 2px 3px;
     }
 
-    #keyboard a:hover + dl{
-        display: block;
-    }
+        #keyboard a:hover + dl {
+            display: block;
+        }
 
     #keyboard dl {
         position: absolute;
