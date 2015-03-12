@@ -81,19 +81,24 @@
             case 46: //delete
                 if (!evt.shiftKey) {
                     handled = false;
-                    var nextNewLine = text.indexOf("\n", selEnd);
-                    for (i = selEnd; i < text.length; ++i) {
-                        if (text[i] === " ") {
-                            continue;
-                        }
-                        if (text[i] === "\n") {
-                            if (nextNewLine !== i) {
+
+                    if (selEnd < text.length && text[selEnd] === '\n') {
+                        ++selEnd;
+                        var nextNewLine = text.indexOf("\n", selEnd);
+                        for (i = selEnd; i < text.length; ++i) {
+                            if (text[i] === " ") {
+                                continue;
+                            }
+                            if (text[i] === "\n") {
+                                if (nextNewLine !== i) {
+                                    break;
+                                }
+
+                                handled = true;
+                                src.value = text.substr(0, selStart) + text.substr(nextNewLine);
+                                src.setSelectionRange(selStart, selStart);
                                 break;
                             }
-
-                            handled = true;
-                            src.value = text.substr(0, selStart) + text.substr(nextNewLine);
-                            src.setSelectionRange(selStart, selStart);
                         }
                     }
 
