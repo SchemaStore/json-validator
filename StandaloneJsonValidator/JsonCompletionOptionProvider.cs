@@ -22,7 +22,7 @@ namespace StandaloneJsonValidator
             loader.SetCacheItem(new JSONDocumentLoadResult(instanceDoc));
 
             JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc.TopLevelValue, (JSONObject)schemaDoc.TopLevelValue, loader, formatHandlers).Result;
-            var parseItem = instanceDoc.ItemAfterPosition(cursorPosition);
+            var parseItem = instanceDoc.ItemBeforePosition(cursorPosition);
 
             var convertToReportMethod = typeof (JSONSchemaDraft4Evaluator).GetMethod("ConvertToReport", BindingFlags.Static | BindingFlags.NonPublic);
             var report = (JSONSchemaDraft4EvaluationReport) convertToReportMethod.Invoke(null, new object[] {tree});
@@ -32,6 +32,7 @@ namespace StandaloneJsonValidator
                 parseItem = parseItem.PreviousSibling;
             }
 
+            var originalItem = parseItem;
             while (parseItem != null && parseItem is JSONTokenItem)
             {
                 parseItem = parseItem.Parent;
@@ -41,19 +42,24 @@ namespace StandaloneJsonValidator
 
             if (member != null)
             {
-                var options = report.GetValueOptionsAsync(member, cursorPosition).Result;
-
-                foreach (var option in options)
+                if (member.Name != originalItem)
                 {
-                    allOptions.Add(new JSONOption
+                    var options = report.GetValueOptionsAsync(member, cursorPosition).Result;
+
+                    foreach (var option in options)
                     {
-                        InsertionText = option.InsertionText,
-                        DisplayText = option.DisplayText,
-                        Type = option.Format
-                    });
+                        allOptions.Add(new JSONOption
+                        {
+                            InsertionText = option.InsertionText,
+                            DisplayText = option.DisplayText,
+                            Type = option.Format
+                        });
+                    }
+
+                    return allOptions;
                 }
 
-                return allOptions;
+                parseItem = parseItem.Parent;
             }
 
             JSONArrayElement arrayElement = parseItem as JSONArrayElement;

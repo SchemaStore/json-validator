@@ -120,9 +120,10 @@
         return pad.length;
     }
 
-    function handleEditingKeys(e) {
+    function handleKeyPress(e){
         var evt = e || event;
         var code = evt.keyCode || e.which;
+        var chr = String.fromCharCode(code)
         var src = evt.srcElement;
         var selStart = src.selectionStart;
         var selEnd = src.selectionEnd;
@@ -134,8 +135,9 @@
 
         //console.log(code);
 
-        switch (code) {
-            case 219: // [ or {
+        switch (chr) {
+            case "{":
+            case "[":
                 var open = evt.shiftKey ? "{" : "[";
                 var close = evt.shiftKey ? "}" : "]";
                 var selLen = selEnd - selStart;
@@ -154,7 +156,8 @@
                 src.value += close + tail;
                 src.setSelectionRange(newSelStart, newSelStart + selLen);
                 break;
-            case 222: // ' or "
+            case "\"":
+            case "'":
                 var open = evt.shiftKey ? "\"" : "'";
                 var sel = text.substr(selStart, selLen);
                 var tail = text.substr(selEnd);
@@ -166,6 +169,54 @@
                 src.value += open + tail;
                 src.setSelectionRange(newSelStart, newSelStart + selLen);
                 break;
+            case " ":
+                if (evt.ctrlKey) {
+                    getCompletions(src, selStart, selStart);
+                } else {
+                    handled = false;
+                }
+                break;
+            case "1": //Alt+1 (expand)
+                if (!evt.altKey) {
+                    handled = false;
+                    break;
+                }
+                break;
+            case "2": //Alt+2 (contract)
+                if (!evt.altKey) {
+                    handled = false;
+                    break;
+                }
+                break;
+            default:
+                handled = false;
+                break;
+        }
+
+        if (handled) {
+            evt.preventDefault();
+            evt.cancelBubble = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    function handleKeyDown(e) {
+        var evt = e || event;
+        var code = evt.keyCode || e.which;
+        var src = evt.srcElement;
+        var selStart = src.selectionStart;
+        var selEnd = src.selectionEnd;
+        var selLen = selEnd - selStart;
+        var text = src.value;
+        var lineStart = findLineStart(text, selStart);
+        var i;
+        var handled = true;
+        
+        //console.log(code);
+
+        switch (code) {
             case 46: //delete
                 if (!evt.shiftKey) {
                     handled = false;
@@ -241,13 +292,6 @@
             case 113:
                 elCaptureTabs.checked = !elCaptureTabs.checked;
                 break;
-            case 32:
-                if (evt.ctrlKey) {
-                    getCompletions(src, selStart, selStart);
-                } else {
-                    handled = false;
-                }
-                break;
             case 13: //return
                 if (evt.ctrlKey) {
                     elForm.querySelector("input[type=submit]").click();
@@ -269,18 +313,6 @@
 
                 handleReturn(src, lineStart, selStart, selEnd, prevBraceFound);
                 break;
-            case 49: //1 (expand)
-                if (!evt.altKey) {
-                    handled = false;
-                    break;
-                }
-                break;
-            case 50: //2 (contract)
-                if (!evt.altKey) {
-                    handled = false;
-                    break;
-                }
-                break;
             default:
                 handled = false;
                 break;
@@ -294,8 +326,11 @@
 
         return true;
     }
+    
+    elInstance.addEventListener("keypress", handleKeyPress, true);
+    elSchema.addEventListener("keypress", handleKeyPress, true);
 
-    elInstance.addEventListener("keydown", handleEditingKeys, true);
-    elSchema.addEventListener("keydown", handleEditingKeys, true);
+    elInstance.addEventListener("keydown", handleKeyDown, true);
+    elSchema.addEventListener("keydown", handleKeyDown, true);
 
 })();
