@@ -21,7 +21,7 @@ namespace StandaloneJsonValidator
             loader.SetCacheItem(new JSONDocumentLoadResult(schemaDoc));
             loader.SetCacheItem(new JSONDocumentLoadResult(instanceDoc));
 
-            JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc.TopLevelValue, (JSONObject)schemaDoc.TopLevelValue, loader, formatHandlers).Result;
+            JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc, (JSONObject)schemaDoc.TopLevelValue, loader, formatHandlers).Result;
             var parseItem = instanceDoc.ItemBeforePosition(cursorPosition);
 
             var convertToReportMethod = typeof (JSONSchemaDraft4Evaluator).GetMethod("ConvertToReport", BindingFlags.Static | BindingFlags.NonPublic);

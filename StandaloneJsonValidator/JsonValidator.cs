@@ -38,24 +38,22 @@ namespace StandaloneJsonValidator
                 });
             }
 
+            foreach (Tuple<JSONParseItem, JSONParseError> error in schemaDoc.GetContainedParseErrors())
             {
-                foreach (Tuple<JSONParseItem, JSONParseError> error in schemaDoc.GetContainedParseErrors())
+                allErrors.Add(new JSONError
                 {
-                    allErrors.Add(new JSONError
-                    {
-                        Kind = JSONErrorKind.Syntax,
-                        Length = error.Item1.Length,
-                        Start = error.Item1.Start,
-                        Location = JSONErrorLocation.Schema,
-                        Message = error.Item2.Text ?? error.Item2.ErrorType.ToString()
-                    });
-                }
+                    Kind = JSONErrorKind.Syntax,
+                    Length = error.Item1.Length,
+                    Start = error.Item1.Start,
+                    Location = JSONErrorLocation.Schema,
+                    Message = error.Item2.Text ?? error.Item2.ErrorType.ToString()
+                });
             }
 
             loader.SetCacheItem(new JSONDocumentLoadResult(schemaDoc));
             loader.SetCacheItem(new JSONDocumentLoadResult(instanceDoc));
 
-            JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc.TopLevelValue, (JSONObject) schemaDoc.TopLevelValue, loader, formatHandlers).Result;
+            JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc, (JSONObject) schemaDoc.TopLevelValue, loader, formatHandlers).Result;
 
             foreach (JSONSchemaValidationIssue issue in tree.ValidationIssues)
             {
