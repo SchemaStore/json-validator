@@ -38,6 +38,12 @@ public class v1 : IHttpHandler
             return;
         }
 
+        if (request.Instance.Kind == null || request.Schema.Kind == null)
+        {
+            context.WriteResponse(new ApiError { Message = "One or both input kinds were not set. Valid values are : Uri, Text" }, HttpStatusCode.BadRequest);
+            return;
+        }
+
         if (request.Instance == null)
         {
             if (request.Schema == null)

@@ -6,6 +6,12 @@ namespace JSONWebValidator.Models
     public class JSONCompletionResponse
     {
         [JsonProperty]
+        public int ReplacementStart { get; set; }
+
+        [JsonProperty]
+        public int ReplacementLength { get; set; }
+
+        [JsonProperty]
         public List<JSONCompletionOption> Options { get; set; }
     }
 

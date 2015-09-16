@@ -13,6 +13,89 @@
         return "Text";
     }
 
+    //Adapted (very lightly) from https://raw.githubusercontent.com/component/textarea-caret-position/master/index.js
+    function getCaretCoordinates(element, position) {
+        // mirrored div
+        var div = document.createElement("div");
+        div.id = "input-textarea-caret-position-mirror-div";
+        document.body.appendChild(div);
+
+        var style = div.style;
+        var computed = window.getComputedStyle ? getComputedStyle(element) : element.currentStyle;  // currentStyle for IE < 9
+        var yScale = style.msFlexWrap !== undefined || window.navigator.userAgent.toLowerCase().indexOf('edge') > -1 ? .75 : 1;
+        var xScale = style.msFlexWrap !== undefined || window.navigator.userAgent.toLowerCase().indexOf('edge') > -1 ? 1.25 : 1;
+
+        // default textarea styles
+        style.whiteSpace = "pre-wrap";
+        style.wordWrap = "break-word";  // only for textarea-s
+
+        // position off-screen
+        style.position = "absolute";  // required to return coordinates properly
+        style.visibility = "hidden";  // not 'display: none' because we want rendering
+
+        var props = [
+            "direction", // RTL support
+            "boxSizing",
+            "width", // on Chrome and IE, exclude the scrollbar, so the mirror div wraps exactly as the textarea does
+            "height",
+            "overflowX",
+            "overflowY", // copy the scrollbar for IE
+            "borderTopWidth",
+            "borderRightWidth",
+            "borderBottomWidth",
+            "borderLeftWidth",
+            "borderStyle",
+            "paddingTop",
+            "paddingRight",
+            "paddingBottom",
+            "paddingLeft",
+
+            // https://developer.mozilla.org/en-US/docs/Web/CSS/font
+            "fontStyle",
+            "fontVariant",
+            "fontWeight",
+            "fontStretch",
+            "fontSize",
+            "fontSizeAdjust",
+            "lineHeight",
+            "fontFamily",
+            "textAlign",
+            "textTransform",
+            "textIndent",
+            "textDecoration", // might not make a difference, but better be safe
+            "letterSpacing",
+            "wordSpacing",
+            "tabSize",
+            "MozTabSize"
+        ];
+
+        for (var i = 0; i < props.length; ++i) {
+            style[props[i]] = computed[props[i]];
+        }
+
+        style.overflow = "hidden";  // for Chrome to not render a scrollbar; IE keeps overflowY = 'scroll'
+
+        div.textContent = element.value.substring(0, position);
+
+        var span = document.createElement("span");
+        // Wrapping must be replicated *exactly*, including when a long word gets
+        // onto the next line, with whitespace at the end of the line before (#7).
+        // The  *only* reliable way to do that is to copy the *entire* rest of the
+        // textarea's content into the <span> created at the caret position.
+        // for inputs, just '.' would be enough, but why bother?
+        span.textContent = element.value.substring(position) || ".";  // || because a completely empty faux span doesn't render at all
+        div.appendChild(span);
+
+        var coordinates = {
+            top: yScale * (span.offsetTop + parseInt(computed["borderTopWidth"])) + element.offsetTop,
+            left: xScale * (span.offsetLeft + parseInt(computed["borderLeftWidth"])) + element.offsetLeft
+    };
+
+        document.body.removeChild(div);
+
+        return coordinates;
+    }
+
     function getPostObject(instance, schema, cursorPosition) {
         var obj = {
             Instance: {
@@ -29,41 +112,73 @@
         return JSON.stringify(obj);
     }
 
-    function showCompletionOptions(focusedBox, cursorPosition, optionsResponse) {
-        //var selectElement = document.getElementById("intellisense");
+    var existingSelect;
 
-        //while (selectElement.children.length > 0) {
-        //    selectElement.removeChild(selectElement.children[0]);
-        //}
+    function showCompletionOptions(focusedBox, cursorPosition, optionsResponse) {
+
+        if (optionsResponse.Options.length === 0) {
+            return;
+        }
+        
+        if (existingSelect) {
+            existingSelect.onkeydown = null;
+            existingSelect.parentElement.removeChild(existingSelect);
+        }
+
+        var selectElement = document.createElement("select");
+        existingSelect = selectElement;
 
         for (var i = 0; i < optionsResponse.Options.length; ++i) {
             var opt = optionsResponse.Options[i];
-            //var optElem = document.createElement("option");
-            //optElem.innerHTML = opt.DisplayText;
-            //optElem.value = opt.InsertionText;
-            //optElem.alt = optElem.title = opt.Type;
-            //selectElement.appendChild(optElem);
+            var optElem = document.createElement("option");
+            optElem.innerHTML = opt.DisplayText;
+            optElem.value = opt.InsertionText;
+            optElem.alt = optElem.title = opt.Type;
+            selectElement.appendChild(optElem);
         }
 
-        //focusedBox.setSelectionRange(cursorPosition, cursorPosition);
-        //focusedBox.focus();
+        focusedBox.setSelectionRange(cursorPosition, cursorPosition);
+        focusedBox.focus();
 
-        //var newlineCount = 0;
-        //for (var i = 0; i < cursorPosition && i < focusedBox.value.length; ++i) {
-        //    if (focusedBox.value[i] === "\n") {
-        //        ++newlineCount;
-        //    }
-        //}
+        var coords = getCaretCoordinates(focusedBox, cursorPosition);
+        selectElement.style.position = "absolute";
+        selectElement.style.left = coords.left + "px";
+        selectElement.style.top = coords.top + "px";
 
-        //var computedStyle = focusedBox.currentStyle || window.getComputedStyle(focusedBox);
-        //var lineOffset = parseInt(computedStyle.lineHeight) * newlineCount;
-        //var yOffset = focusedBox.offsetTop;
-        //var expectY = yOffset + lineOffset - focusedBox.scrollTop;
-        //selectElement.style.top = expectY + "px";
+        focusedBox.parentElement.appendChild(selectElement);
+        selectElement.className = "selected";
 
-        //selectElement.className = "selected";
-        //selectElement.focus();
-        //selectElement.click();
+        selectElement.onkeydown = function (e) {
+            if (e.which === 13 || e.keyCode === 13
+                || e.which === 9 || e.keyCode === 9) {
+                focusedBox.focus();
+                var selVal = selectElement.value;
+                var newVal = focusedBox.value.substr(0, optionsResponse.ReplacementStart) + selVal + focusedBox.value.substr(optionsResponse.ReplacementStart + optionsResponse.ReplacementLength);
+                focusedBox.value = newVal;
+
+                selectElement.onkeydown = null;
+                existingSelect.parentElement.removeChild(existingSelect);
+                existingSelect = null;
+
+                focusedBox.focus();
+                focusedBox.setSelectionRange(optionsResponse.ReplacementStart + selVal.length, optionsResponse.ReplacementStart + selVal.length);
+                return false;
+            }
+
+            if (e.which === 27 || e.keyCode === 27) {
+                selectElement.onkeydown = null;
+                existingSelect.parentElement.removeChild(existingSelect);
+                existingSelect = null;
+
+                focusedBox.focus();
+                return false;
+            }
+
+            return true;
+        };
+
+        selectElement.focus();
+        selectElement.size = Math.min(10, selectElement.length);
     }
 
     function getCompletions(focusedBox, cursorPosition) {
@@ -120,7 +235,7 @@
         return pad.length;
     }
 
-    function handleKeyPress(e){
+    function handleKeyPress(e) {
         var evt = e || event;
         var code = evt.keyCode || e.which;
         var chr = String.fromCharCode(code)
@@ -213,7 +328,7 @@
         var lineStart = findLineStart(text, selStart);
         var i;
         var handled = true;
-        
+
         //console.log(code);
 
         switch (code) {
@@ -326,7 +441,7 @@
 
         return true;
     }
-    
+
     elInstance.addEventListener("keypress", handleKeyPress, true);
     elSchema.addEventListener("keypress", handleKeyPress, true);
 

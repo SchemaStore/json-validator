@@ -38,7 +38,7 @@ public class v1 : IHttpHandler
             return;
         }
 
-        IEnumerable<JSONOption> options;
+        JSONCompletionOptionResult options;
 
         switch (request.Instance.Kind)
         {
@@ -85,16 +85,19 @@ public class v1 : IHttpHandler
                 return;
         }
 
-        var response = new JSONCompletionResponse();
-
-        var results = options.Select(x => new JSONCompletionOption
+        var results = options.Options.Select(x => new JSONCompletionOption
         {
             InsertionText = x.InsertionText,
             DisplayText = x.DisplayText,
             Type = x.Type
-        }).ToList();
+        }).Where(x => !string.IsNullOrEmpty(x.DisplayText)).ToList();
 
-        response.Options = results;
+        var response = new JSONCompletionResponse
+        {
+            ReplacementStart = options.ReplaceStart,
+            ReplacementLength = options.ReplaceLength,
+            Options = results
+        };
 
         context.WriteResponse(response, HttpStatusCode.OK);
     }

@@ -6,7 +6,7 @@ namespace JSONWebValidator.Models
     public class JSONFile
     {
         [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
-        public JSONFileKind Kind { get; set; }
+        public JSONFileKind? Kind { get; set; }
 
         [JsonProperty]
         public string Value { get; set; }
