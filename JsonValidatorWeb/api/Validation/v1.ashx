@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using JSONWebValidator.Models;
 using Microsoft.JSON.Core.Schema;
@@ -12,12 +13,33 @@ using Microsoft.JSON.Core.Schema.Validation.Format;
 using Newtonsoft.Json;
 using StandaloneJsonValidator;
 
-public class v1 : IHttpHandler
+public class v1 : IHttpAsyncHandler
 {
-
     private static readonly int[] AcceptedVersions = { 4 };
 
     public void ProcessRequest(HttpContext context)
+    {
+        throw new InvalidOperationException();
+    }
+
+    private static readonly IEnumerable<IJSONSchemaFormatHandler> FormatHandlers = new IJSONSchemaFormatHandler[] { new DateTimeValidator(), new EmailValidator(), new HostNameValidator(), new InternetProtocolAddressV4Validator(), new InternetProtocolAddressV6Validator(), new RegexValidator(), new UriValidator(), new UrlValidator() };
+
+    public bool IsReusable
+    {
+        get
+        {
+            return true;
+        }
+    }
+
+    public IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData)
+    {
+        Task processingTask = ProcessAsync(context);
+        processingTask.ContinueWith(x => cb(processingTask));
+        return processingTask;
+    }
+
+    private static async Task ProcessAsync(HttpContext context)
     {
         if (!string.Equals(context.Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
         {
@@ -77,34 +99,34 @@ public class v1 : IHttpHandler
                 Uri instanceUri = new Uri(request.Instance.Value, UriKind.Absolute);
                 if (request.Schema == null)
                 {
-                    issues = JsonValidator.Validate(instanceUri, (string)null, FormatHandlers);
+                    issues = await JsonValidator.ValidateAsync(instanceUri, (string)null, FormatHandlers);
                     break;
                 }
 
                 switch (request.Schema.Kind)
                 {
                     case JSONFileKind.Uri:
-                        issues = JsonValidator.Validate(instanceUri, new Uri(request.Schema.Value, UriKind.Absolute), FormatHandlers);
+                        issues = await JsonValidator.ValidateAsync(instanceUri, new Uri(request.Schema.Value, UriKind.Absolute), FormatHandlers);
                         break;
                     default:
-                        issues = JsonValidator.Validate(instanceUri, request.Schema.Value, FormatHandlers);
+                        issues = await JsonValidator.ValidateAsync(instanceUri, request.Schema.Value, FormatHandlers);
                         break;
                 }
                 break;
             case JSONFileKind.Text:
                 if (request.Schema == null)
                 {
-                    issues = JsonValidator.Validate(request.Instance.Value, (string)null, FormatHandlers);
+                    issues = await JsonValidator.ValidateAsync(request.Instance.Value, (string)null, FormatHandlers);
                     break;
                 }
 
                 switch (request.Schema.Kind)
                 {
                     case JSONFileKind.Uri:
-                        issues = JsonValidator.Validate(request.Instance.Value, new Uri(request.Schema.Value, UriKind.Absolute), FormatHandlers);
+                        issues = await JsonValidator.ValidateAsync(request.Instance.Value, new Uri(request.Schema.Value, UriKind.Absolute), FormatHandlers);
                         break;
                     default:
-                        issues = JsonValidator.Validate(request.Instance.Value, request.Schema.Value, FormatHandlers);
+                        issues = await JsonValidator.ValidateAsync(request.Instance.Value, request.Schema.Value, FormatHandlers);
                         break;
                 }
                 break;
@@ -136,13 +158,7 @@ public class v1 : IHttpHandler
         context.WriteResponse(response, HttpStatusCode.OK);
     }
 
-    private static readonly IEnumerable<IJSONSchemaFormatHandler> FormatHandlers = new IJSONSchemaFormatHandler[] { new DateTimeValidator(), new EmailValidator(), new HostNameValidator(), new InternetProtocolAddressV4Validator(), new InternetProtocolAddressV6Validator(), new RegexValidator(), new UriValidator(), new UrlValidator() };
-
-    public bool IsReusable
+    public void EndProcessRequest(IAsyncResult result)
     {
-        get
-        {
-            return true;
-        }
     }
 }

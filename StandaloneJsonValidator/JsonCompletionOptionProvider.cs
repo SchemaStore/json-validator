@@ -23,7 +23,7 @@ namespace StandaloneJsonValidator
         public static JSONCompletionOptionResult GetCompletionOptions(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider, IEnumerable<IJSONSchemaFormatHandler> formatHandlers, int cursorPosition)
         {
             JSONDocumentLoader loader = new JSONDocumentLoader();
-            JSONParser parser = JSONParserHack.Create();
+            JSONParser parser = new JSONParser();
             JSONDocument schemaDoc = parser.Parse(schemaTextProvider);
             JSONDocument instanceDoc = parser.Parse(instanceTextProvider);
             List<JSONOption> allOptions = new List<JSONOption>();

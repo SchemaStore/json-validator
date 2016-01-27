@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.JSON.Core.Parser;
 using Microsoft.JSON.Core.Parser.TreeItems;
 using Microsoft.JSON.Core.Schema;
@@ -13,15 +15,20 @@ namespace StandaloneJsonValidator
 {
     public static class JsonValidator
     {
-        public static bool Validate(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider)
+        static JsonValidator()
         {
-            return !Validate(instanceTextProvider, schemaTextProvider, Enumerable.Empty<IJSONSchemaFormatHandler>()).Errors.Any();
+            ThreadPool.SetMaxThreads(10000, 10000);
         }
 
-        public static ValidationResult Validate(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static async Task<bool> ValidateAsync(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider)
+        {
+            return !(await ValidateAsync(instanceTextProvider, schemaTextProvider, Enumerable.Empty<IJSONSchemaFormatHandler>())).Errors.Any();
+        }
+
+        public static async Task<ValidationResult> ValidateAsync(StringWithFileNameTextProvider instanceTextProvider, StringWithFileNameTextProvider schemaTextProvider, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             JSONDocumentLoader loader = new JSONDocumentLoader();
-            JSONParser parser = JSONParserHack.Create();
+            JSONParser parser = new JSONParser();
             JSONDocument schemaDoc = parser.Parse(schemaTextProvider);
             JSONDocument instanceDoc = parser.Parse(instanceTextProvider);
             List<JSONError> allErrors = new List<JSONError>();
@@ -53,7 +60,7 @@ namespace StandaloneJsonValidator
             loader.SetCacheItem(new JSONDocumentLoadResult(schemaDoc));
             loader.SetCacheItem(new JSONDocumentLoadResult(instanceDoc));
 
-            JSONSchemaDraft4EvaluationTreeNode tree = JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc, (JSONObject) schemaDoc.TopLevelValue, loader, formatHandlers).Result;
+            JSONSchemaDraft4EvaluationTreeNode tree = await JSONSchemaDraft4EvaluationTreeProducer.CreateEvaluationTreeAsync(instanceDoc, (JSONObject) schemaDoc.TopLevelValue, loader, formatHandlers).ConfigureAwait(false);
 
             foreach (JSONSchemaValidationIssue issue in tree.ValidationIssues)
             {
@@ -87,11 +94,11 @@ namespace StandaloneJsonValidator
             };
         }
 
-        public static ValidationResult Validate(string instanceText, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static Task<ValidationResult> ValidateAsync(string instanceText, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(@"c:\temp\instance.json", instanceText);
             StringWithFileNameTextProvider schemaProvider = new StringWithFileNameTextProvider(@"c:\temp\schema.json", schemaText);
-            return Validate(instanceProvider, schemaProvider, formatHandlers);
+            return ValidateAsync(instanceProvider, schemaProvider, formatHandlers);
         }
 
         public static string Download(Uri location)
@@ -112,7 +119,7 @@ namespace StandaloneJsonValidator
             }
         }
 
-        public static ValidationResult Validate(string instanceText, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static Task<ValidationResult> ValidateAsync(string instanceText, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(@"c:\temp\instance.json", instanceText);
 
@@ -124,10 +131,10 @@ namespace StandaloneJsonValidator
                 schemaProvider = new StringWithFileNameTextProvider(schemaLocation.ToString(), schemaText);
             }
 
-            return Validate(instanceProvider, schemaProvider, formatHandlers);
+            return ValidateAsync(instanceProvider, schemaProvider, formatHandlers);
         }
 
-        public static ValidationResult Validate(Uri instanceLocation, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static Task<ValidationResult> ValidateAsync(Uri instanceLocation, string schemaText, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             string instanceText = Download(instanceLocation);
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(instanceLocation.ToString(), instanceText);
@@ -140,10 +147,10 @@ namespace StandaloneJsonValidator
                 schemaProvider = new StringWithFileNameTextProvider(@"c:\temp\schema.json", schemaText);
             }
 
-            return Validate(instanceProvider, schemaProvider, formatHandlers);
+            return ValidateAsync(instanceProvider, schemaProvider, formatHandlers);
         }
 
-        public static ValidationResult Validate(Uri instanceLocation, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
+        public static Task<ValidationResult> ValidateAsync(Uri instanceLocation, Uri schemaLocation, IEnumerable<IJSONSchemaFormatHandler> formatHandlers)
         {
             string instanceText = Download(instanceLocation);
             StringWithFileNameTextProvider instanceProvider = new StringWithFileNameTextProvider(instanceLocation.ToString(), instanceText);
@@ -155,7 +162,7 @@ namespace StandaloneJsonValidator
                 schemaProvider = new StringWithFileNameTextProvider(schemaLocation.ToString(), schemaText);
             }
 
-            return Validate(instanceProvider, schemaProvider, formatHandlers);
+            return ValidateAsync(instanceProvider, schemaProvider, formatHandlers);
         }
     }
 }

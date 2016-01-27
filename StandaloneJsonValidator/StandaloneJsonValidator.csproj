@@ -62,7 +62,6 @@
     <Compile Include="JsonCompletionOptionProvider.cs" />
     <Compile Include="JSONError.cs" />
     <Compile Include="JSONOption.cs" />
-    <Compile Include="JSONParserHack.cs" />
     <Compile Include="JsonValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringWithFileNameTextProvider.cs" />

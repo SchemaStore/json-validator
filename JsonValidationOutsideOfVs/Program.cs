@@ -12,7 +12,7 @@ namespace JsonValidationOutsideOfVs
             string requestText = @"{
     ""Instance"": {
         ""Kind"": ""Text"",
-        ""Value"": ""{ \""f\"" }""
+        ""Value"": ""{ \""f\"": 3 }""
     },
     ""Schema"": {
         ""Kind"": ""Text"",
@@ -20,7 +20,7 @@ namespace JsonValidationOutsideOfVs
     }
 }";
 
-            WebRequest request = WebRequest.CreateHttp("http://localhost:20700/Validator.ashx");
+            WebRequest request = WebRequest.CreateHttp("http://jsonvalidator.schemastore.org/api/Validation/v1.ashx?version=4");
             request.Method = "POST";
             var requestStream = request.GetRequestStream();
             var writer = new StreamWriter(requestStream, Encoding.UTF8);
